@@ -1,17 +1,20 @@
-import axios from "axios";
+import axios, { AxiosError } from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
+import type { JSendResponse } from '../types/api';
+
+const API_URL = 'http://localhost:4000/api/v1';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
-  timeout: 10000,
+  baseURL: API_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor
+// Request Interceptor: Attach Token
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
+  (config: InternalAxiosRequestConfig) => {
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -22,17 +25,23 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response Interceptor: Handle JSend Errors & Auth Failures
 api.interceptors.response.use(
   (response) => {
+    // Return the full response for now, components can extract data
     return response;
   },
-  (error) => {
+  (error: AxiosError<JSendResponse<any>>) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+      // Clear token on 401 Unauthorized
+      localStorage.removeItem('token');
+      // Optional: Redirect to login or dispatch event
+      window.dispatchEvent(new Event('auth:unauthorized'));
     }
-    return Promise.reject(error);
+    
+    // Normalize error message from JSend format
+    const message = error.response?.data?.message || 'An unexpected error occurred';
+    return Promise.reject(new Error(message));
   }
 );
 
