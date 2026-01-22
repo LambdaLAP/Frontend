@@ -130,7 +130,13 @@ const LessonView = () => {
         <PanelGroup orientation="horizontal">
             {/* Left Panel: Content */}
             <Panel defaultSize={40} minSize={20} className="bg-white">
-                <LessonContent content={lesson.contentMarkdown || "# No content available"} />
+                <LessonContent 
+                    content={
+                        (activeChallenge?.description) 
+                        ? activeChallenge.description 
+                        : (lesson.contentMarkdown || "# No content available")
+                    } 
+                />
             </Panel>
             
             <PanelResizeHandle className="w-2 bg-gray-100 border-x border-gray-200 hover:bg-blue-50 transition-colors flex items-center justify-center cursor-col-resize z-10">
