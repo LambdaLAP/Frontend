@@ -9,7 +9,7 @@ export interface JSendResponse<T> {
 export interface User {
   id: string;
   email: string;
-  role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
+  role: "STUDENT" | "INSTRUCTOR" | "ADMIN";
   profileData?: {
     name: string;
   };
@@ -29,7 +29,7 @@ export interface Course {
   id: string;
   title: string;
   description: string;
-  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  difficulty: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
   tags: string[];
   isPublished?: boolean;
   meta: {
@@ -49,28 +49,42 @@ export interface Enrollment {
 export interface Lesson {
   id: string;
   title: string;
-  orderIndex: number;
-  type: 'LESSON' | 'CHALLENGE';
-  status?: 'LOCKED' | 'IN_PROGRESS' | 'COMPLETED'; // Inferred from syllabus
+  orderIndex?: number; // Optional in Get Lesson Details
+  type: "LESSON" | "CHALLENGE" | "PROJECT" | "QUIZ"; // Added other types just in case
+  status?: "LOCKED" | "IN_PROGRESS" | "COMPLETED";
   contentMarkdown?: string;
+  courseId?: string;
+  challenges?: Challenge[]; // API returns an array
+  nextLessonId?: string;
+  prevLessonId?: string;
 }
 
 export interface Challenge {
   id: string;
-  lessonId: string;
+  lessonId?: string;
   title: string;
-  starterCode: string;
-  language: string;
-  testCases?: any[];
+  starterCodes: Record<string, string>; // Map of language -> code
+  testCases?: TestCase[]; // Students see only isHidden: false
+}
+
+export interface TestCase {
+  input: any;
+  expectedOutput: any;
+  isHidden: boolean;
 }
 
 export interface ExecutionResult {
-  status: 'PASS' | 'FAIL' | 'ERROR';
+  status: "PASS" | "FAIL" | "ERROR" | "PASSED" | "FAILED"; // Covering both run and submit variations
   stdout: string;
   stderr?: string;
   metrics: {
     runtime: string;
+    memoryUsed?: string;
   };
+}
+
+export interface SubmissionResult extends ExecutionResult {
+  submissionId: string;
 }
 
 export interface DashboardResponse {
@@ -90,7 +104,6 @@ export interface DashboardResponse {
   } | null;
 }
 
-
 export interface SyllabusResponse {
   course: {
     id: string;
@@ -104,7 +117,7 @@ export interface SyllabusResponse {
     id: string;
     orderIndex: number;
     title: string;
-    type: 'LESSON' | 'CHALLENGE';
-    status: 'LOCKED' | 'IN_PROGRESS' | 'COMPLETED';
+    type: "LESSON" | "CHALLENGE";
+    status: "LOCKED" | "IN_PROGRESS" | "COMPLETED";
   }[];
 }

@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import AuthLayout from '../../components/layouts/AuthLayout';
-import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
-import { useAuth } from '../../contexts/AuthContext';
-import api from '../../services/api';
-import type { JSendResponse, AuthResponse } from '../../types/api';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import AuthLayout from "../../components/layouts/AuthLayout";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import { useAuth } from "../../contexts/AuthContext";
+import api from "../../services/api";
+import type { JSendResponse, AuthResponse } from "../../types/api";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,27 +31,30 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.post<JSendResponse<AuthResponse>>('/auth/register', {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password
-      });
-      
+      const response = await api.post<JSendResponse<AuthResponse>>(
+        "/auth/register",
+        {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }
+      );
+
       if (response.data.success && response.data.data) {
         const { token, user } = response.data.data;
         login(token, user);
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to register');
+      setError(err.message || "Failed to register");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <AuthLayout 
-      title="Create an account" 
+    <AuthLayout
+      title="Create an account"
       subtitle="Start your journey with Lambda LAP today"
     >
       <form className="space-y-6" onSubmit={handleSubmit}>
@@ -59,7 +62,9 @@ const Register: React.FC = () => {
           <div className="rounded-md bg-red-50 p-4 border border-red-100">
             <div className="flex">
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Registration failed</h3>
+                <h3 className="text-sm font-medium text-red-800">
+                  Registration failed
+                </h3>
                 <div className="mt-2 text-sm text-red-700">
                   <p>{error}</p>
                 </div>
@@ -97,7 +102,9 @@ const Register: React.FC = () => {
           required
           autoComplete="new-password"
           value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
           disabled={isLoading}
         />
 
@@ -108,16 +115,14 @@ const Register: React.FC = () => {
           required
           autoComplete="new-password"
           value={formData.confirmPassword}
-          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, confirmPassword: e.target.value })
+          }
           disabled={isLoading}
         />
 
         <div>
-          <Button
-            type="submit"
-            className="w-full"
-            isLoading={isLoading}
-          >
+          <Button type="submit" className="w-full" isLoading={isLoading}>
             Create account
           </Button>
         </div>
@@ -129,7 +134,9 @@ const Register: React.FC = () => {
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-gray-500">Already have an account?</span>
+            <span className="bg-white px-2 text-gray-500">
+              Already have an account?
+            </span>
           </div>
         </div>
 

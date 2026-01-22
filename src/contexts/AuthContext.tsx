@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import api from '../services/api';
-import type { User, JSendResponse } from '../types/api';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
+import api from "../services/api";
+import type { User, JSendResponse } from "../types/api";
 
 interface AuthContextType {
   user: User | null;
@@ -15,9 +15,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token")
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -25,12 +29,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (token) {
         try {
           // Verify token and get fresh user data
-          const response = await api.get<JSendResponse<{ user: User }>>('/auth/me');
+          const response =
+            await api.get<JSendResponse<{ user: User }>>("/auth/me");
           if (response.data.success && response.data.data) {
             setUser(response.data.data.user);
           }
         } catch (error) {
-          console.error('Failed to restore session:', error);
+          console.error("Failed to restore session:", error);
           logout();
         }
       }
@@ -38,24 +43,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     initAuth();
-    
+
     // Listen for unauthorized events from axios interceptor
     const handleUnauthorized = () => logout();
-    window.addEventListener('auth:unauthorized', handleUnauthorized);
-    
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+
     return () => {
-      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
     };
   }, [token]);
 
   const login = (newToken: string, newUser: User) => {
-    localStorage.setItem('token', newToken);
+    localStorage.setItem("token", newToken);
     setToken(newToken);
     setUser(newUser);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setToken(null);
     setUser(null);
   };
@@ -63,17 +68,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const refreshUser = async () => {
     if (!token) return;
     try {
-      const response = await api.get<JSendResponse<{ user: User }>>('/auth/me');
+      const response = await api.get<JSendResponse<{ user: User }>>("/auth/me");
       if (response.data.success && response.data.data) {
         setUser(response.data.data.user);
       }
     } catch (error) {
-      console.error('Failed to refresh user:', error);
+      console.error("Failed to refresh user:", error);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!user, isLoading, login, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        logout,
+        refreshUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -82,7 +97,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

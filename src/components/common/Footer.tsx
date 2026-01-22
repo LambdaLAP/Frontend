@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const Footer: React.FC = () => {
   return (
@@ -11,9 +11,15 @@ const Footer: React.FC = () => {
             </p>
           </div>
           <div className="flex space-x-6">
-            <a href="#" className="text-gray-400 hover:text-gray-500">Terms</a>
-            <a href="#" className="text-gray-400 hover:text-gray-500">Privacy</a>
-            <a href="#" className="text-gray-400 hover:text-gray-500">Contact</a>
+            <a href="#" className="text-gray-400 hover:text-gray-500">
+              Terms
+            </a>
+            <a href="#" className="text-gray-400 hover:text-gray-500">
+              Privacy
+            </a>
+            <a href="#" className="text-gray-400 hover:text-gray-500">
+              Contact
+            </a>
           </div>
         </div>
       </div>

@@ -1,213 +1,157 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import MainLayout from '../../components/layouts/MainLayout';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
-import Badge from '../../components/ui/Badge';
-import api from '../../services/api';
-import type { JSendResponse, Challenge, ExecutionResult } from '../../types/api';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from "react-resizable-panels";
+import { ChevronLeft, ChevronRight, Home } from "lucide-react";
+import { lessonService } from "../../services/lessonService";
+import { userService } from "../../services/userService";
+import type { Lesson, Challenge } from "../../types/api";
+import LessonContent from "./components/LessonContent";
+import CodeWorkspace from "./components/CodeWorkspace";
+import Button from "../../components/ui/Button";
 
-interface LessonResponse {
-  id: string;
-  title: string;
-  contentMarkdown: string;
-  challenge?: Challenge;
-  nextLessonId?: string;
-  prevLessonId?: string;
-}
-
-const LessonView: React.FC = () => {
+const LessonView = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
-  const [lesson, setLesson] = useState<LessonResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  // Challenge State
-  const [code, setCode] = useState('');
-  const [output, setOutput] = useState<ExecutionResult | null>(null);
-  const [isRunning, setIsRunning] = useState(false);
+  // Track active challenge or generic code state
+  // If lesson type is LESSON, functionality might be limited or illustrative
+  // If type is CHALLENGE, we focus on the code
+  const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
 
   useEffect(() => {
     const fetchLesson = async () => {
       if (!lessonId) return;
-      setIsLoading(true);
-      setOutput(null);
+      
+      setLoading(true);
+      setError(null);
       try {
-        const response = await api.get<JSendResponse<LessonResponse>>(`/lessons/${lessonId}`);
-        if (response.data.success && response.data.data) {
-          const data = response.data.data;
-          setLesson(data);
-          if (data.challenge) {
-            setCode(data.challenge.starterCode);
-          }
+        const data = await lessonService.getLesson(lessonId);
+        
+        // Check enrollment if courseId is available on the lesson
+        if (data.courseId) {
+            const enrollments = await userService.getEnrollments();
+            const isEnrolled = enrollments.some(e => e.courseId === data.courseId);
+            
+            if (!isEnrolled) {
+                navigate(`/courses/${data.courseId}`);
+                return;
+            }
         }
-      } catch (error) {
-        console.error('Failed to load lesson:', error);
+
+        setLesson(data);
+        
+        // Default to first challenge if available
+        if (data.challenges && data.challenges.length > 0) {
+            setActiveChallenge(data.challenges[0]);
+        } else {
+            setActiveChallenge(null);
+        }
+
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load lesson");
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchLesson();
   }, [lessonId]);
 
-  const handleRunCode = async () => {
-    if (!lesson?.challenge) return;
-    
-    setIsRunning(true);
-    try {
-      const response = await api.post<JSendResponse<ExecutionResult>>('/execution/run', {
-        challengeId: lesson.challenge.id,
-        code: code,
-        language: lesson.challenge.language
-      });
-      
-      if (response.data.success && response.data.data) {
-        setOutput(response.data.data);
-        
-        // If passed, mark lesson as completed
-        if (response.data.data.status === 'PASS') {
-            await api.put(`/users/progress/${lesson.id}`, { isCompleted: true });
-        }
-      }
-    } catch (error) {
-        console.error('Execution failed:', error);
-        setOutput({
-            status: 'ERROR',
-            stdout: '',
-            stderr: 'Failed to execute code.',
-            metrics: { runtime: '0s' }
-        });
-    } finally {
-      setIsRunning(false);
-    }
-  };
-
-  const handleNext = () => {
-      if (lesson?.nextLessonId) {
-          navigate(`/lessons/${lesson.nextLessonId}`);
-      }
-  };
-
-  const handlePrev = () => {
-      if (lesson?.prevLessonId) {
-          navigate(`/lessons/${lesson.prevLessonId}`);
-      }
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <MainLayout>
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-        </div>
-      </MainLayout>
+      <div className="h-screen flex items-center justify-center bg-gray-50 text-gray-500">
+        Loading lesson...
+      </div>
     );
   }
 
-  if (!lesson) {
+  if (error || !lesson) {
     return (
-      <MainLayout>
-        <div className="text-center py-12">
-          <h2 className="text-xl font-bold text-gray-900">Lesson not found</h2>
-          <Button variant="ghost" className="mt-4" onClick={() => navigate(-1)}>Go Back</Button>
-        </div>
-      </MainLayout>
+      <div className="h-screen flex flex-col items-center justify-center bg-gray-50 text-red-500 gap-4">
+        <p>{error || "Lesson not found"}</p>
+        <Button onClick={() => navigate("/dashboard")} variant="outline">
+            Back to Dashboard
+        </Button>
+      </div>
     );
   }
+
+  // Determine initial code and language
+  // Fallback to python/empty if not present
+  const initialCode = activeChallenge 
+    ? (activeChallenge.starterCodes?.["python"] || activeChallenge.starterCodes?.[Object.keys(activeChallenge.starterCodes)[0]] || "")
+    : "";
+  
+  const language = "python"; // Defaulting to python for now as per requirement snippet or dynamic based on user selection in future
 
   return (
-    <MainLayout>
-      <div className="max-w-7xl mx-auto h-[calc(100vh-8rem)] flex flex-col lg:flex-row gap-6">
-        {/* Content Pane */}
-        <div className="lg:w-1/2 flex flex-col h-full overflow-hidden">
-           <Card className="h-full flex flex-col overflow-hidden">
-                <div className="border-b border-gray-100 p-6 flex justify-between items-center bg-white sticky top-0 z-10">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{lesson.title}</h1>
-                        <div className="mt-2 flex space-x-2">
-                             <Badge>Lesson</Badge>
-                             {lesson.challenge && <Badge variant="info">Coding Challenge</Badge>}
-                        </div>
-                    </div>
-                </div>
-                <div className="flex-grow overflow-y-auto p-6 prose prose-indigo max-w-none">
-                     <ReactMarkdown>{lesson.contentMarkdown || ''}</ReactMarkdown>
-                </div>
-                <div className="border-t border-gray-100 p-4 bg-gray-50 flex justify-between items-center">
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        disabled={!lesson.prevLessonId}
-                        onClick={handlePrev}
-                    >
-                        ← Previous
-                    </Button>
-                    <Button 
-                         variant="primary"
-                         size="sm"
-                         disabled={!lesson.nextLessonId && !lesson.challenge}
-                         onClick={handleNext}
-                    >
-                        {lesson.challenge ? 'Skip to Next' : 'Next Lesson →'}
-                    </Button>
-                </div>
-           </Card>
+    <div className="h-screen w-screen flex flex-col bg-white text-gray-900">
+      {/* Navigation Header */}
+      <header className="h-14 border-b border-gray-200 flex items-center justify-between px-4 bg-white shadow-sm flex-shrink-0 z-20">
+        <div className="flex items-center gap-4">
+            <Link to="/dashboard" className="p-2 hover:bg-gray-100 rounded-full text-gray-600">
+                <Home className="w-5 h-5"/>
+            </Link>
+            <div className="flex flex-col">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Lesson {lesson.orderIndex}</span>
+                <h1 className="text-sm font-bold text-gray-800">{lesson.title}</h1>
+            </div>
         </div>
 
-        {/* Challenge Pane */}
-        {lesson.challenge && (
-            <div className="lg:w-1/2 flex flex-col h-full">
-                <Card className="h-full flex flex-col bg-gray-900 text-white border-gray-800">
-                    <div className="border-b border-gray-800 p-4 flex justify-between items-center">
-                        <span className="font-mono text-sm text-gray-400">main.{lesson.challenge.language === 'python' ? 'py' : 'js'}</span>
-                        <Button 
-                            variant="primary" 
-                            size="sm" 
-                            onClick={handleRunCode}
-                            isLoading={isRunning}
-                            className="bg-green-600 hover:bg-green-700 text-white shadow-none"
-                        >
-                            Play Code
-                        </Button>
-                    </div>
-                    <div className="flex-grow relative">
-                        <textarea 
-                            className="w-full h-full bg-gray-900 text-gray-100 font-mono p-4 resize-none focus:outline-none text-sm leading-relaxed"
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            spellCheck={false}
-                        />
-                    </div>
-                    
-                    {/* Output Console */}
-                    <div className={`border-t border-gray-800 bg-black/50 transition-all duration-300 flex flex-col ${output ? 'h-48' : 'h-10'}`}>
-                         <div className="px-4 py-2 border-b border-gray-800 text-xs font-mono text-gray-500 uppercase tracking-wider flex justify-between">
-                            <span>Console Output</span>
-                            {output && (
-                                <Badge variant={output.status === 'PASS' ? 'success' : 'error'} className="text-[10px] px-1 py-0 h-4">
-                                    {output.status}
-                                </Badge>
-                            )}
-                         </div>
-                         {output && (
-                             <div className="p-4 font-mono text-sm overflow-y-auto flex-grow">
-                                {output.stdout && <div className="text-gray-300 whitespace-pre-wrap">{output.stdout}</div>}
-                                {output.stderr && <div className="text-red-400 whitespace-pre-wrap">{output.stderr}</div>}
-                                {output.metrics && (
-                                    <div className="mt-2 text-xs text-gray-600">
-                                        Runtime: {output.metrics.runtime}
-                                    </div>
-                                )}
-                             </div>
-                         )}
-                    </div>
-                </Card>
-            </div>
-        )}
+        <div className="flex items-center gap-2">
+            {lesson.prevLessonId && (
+                <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => navigate(`/lessons/${lesson.prevLessonId}`)}
+                    className="text-gray-600"
+                >
+                    <ChevronLeft className="w-4 h-4 mr-1"/> Previous
+                </Button>
+            )}
+             {lesson.nextLessonId && (
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => navigate(`/lessons/${lesson.nextLessonId}`)}
+                >
+                    Next <ChevronRight className="w-4 h-4 ml-1"/>
+                </Button>
+            )}
+        </div>
+      </header>
+
+      {/* Main Workspace Resizable Layout */}
+      <div className="flex-1 min-h-0 relative">
+        <PanelGroup orientation="horizontal">
+            {/* Left Panel: Content */}
+            <Panel defaultSize={40} minSize={20} className="bg-white">
+                <LessonContent content={lesson.contentMarkdown || "# No content available"} />
+            </Panel>
+            
+            <PanelResizeHandle className="w-2 bg-gray-100 border-x border-gray-200 hover:bg-blue-50 transition-colors flex items-center justify-center cursor-col-resize z-10">
+                <div className="h-8 w-1 bg-gray-300 rounded-full" />
+            </PanelResizeHandle>
+
+            {/* Right Panel: Code Workspace */}
+            <Panel defaultSize={60} minSize={30}>
+                {/* Re-mount workspace if challenge changes to reset code state properly, or handle internal updates */}
+                <CodeWorkspace 
+                    key={activeChallenge?.id || 'no-challenge'}
+                    initialCode={initialCode}
+                    language={language}
+                    challengeId={activeChallenge?.id}
+                    challenge={activeChallenge || undefined}
+                />
+            </Panel>
+
+        </PanelGroup>
       </div>
-    </MainLayout>
+    </div>
   );
 };
 

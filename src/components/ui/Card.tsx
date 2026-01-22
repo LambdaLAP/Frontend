@@ -1,5 +1,5 @@
-import React from 'react';
-import type { ReactNode } from 'react';
+import React from "react";
+import type { ReactNode } from "react";
 
 interface CardProps {
   children: ReactNode;
@@ -8,7 +8,12 @@ interface CardProps {
   footer?: ReactNode;
 }
 
-const Card: React.FC<CardProps> = ({ children, className = '', title, footer }) => {
+const Card: React.FC<CardProps> = ({
+  children,
+  className = "",
+  title,
+  footer,
+}) => {
   return (
     <div className={`glass-card rounded-2xl overflow-hidden ${className}`}>
       {title && (
@@ -16,9 +21,7 @@ const Card: React.FC<CardProps> = ({ children, className = '', title, footer }) 
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         </div>
       )}
-      <div className="p-6">
-        {children}
-      </div>
+      <div className="p-6">{children}</div>
       {footer && (
         <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100">
           {footer}

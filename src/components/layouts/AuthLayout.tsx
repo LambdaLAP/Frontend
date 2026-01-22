@@ -1,7 +1,7 @@
-import React from 'react';
-import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
-import logo from '../../assets/Logo.png';
+import React from "react";
+import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
+import logo from "../../assets/Logo.png";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -9,7 +9,11 @@ interface AuthLayoutProps {
   subtitle?: string;
 }
 
-const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) => {
+const AuthLayout: React.FC<AuthLayoutProps> = ({
+  children,
+  title,
+  subtitle,
+}) => {
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -20,9 +24,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
           {title}
         </h2>
         {subtitle && (
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {subtitle}
-          </p>
+          <p className="mt-2 text-center text-sm text-gray-600">{subtitle}</p>
         )}
       </div>
 
