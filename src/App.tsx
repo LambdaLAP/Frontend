@@ -13,9 +13,19 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import CourseList from "./pages/Course/CourseList";
 import CourseDetails from "./pages/Course/CourseDetails";
 import Home from "./pages/Home/Home";
+import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard";
+import LessonView from "./pages/Lesson/LessonView";
 import Mentor from "./pages/Mentor/Mentor";
 import Curriculum from "./pages/Curriculum/Curriculum";
-import LessonView from "./pages/Lesson/LessonView";
+
+// Admin Pages
+import AdminCourses from "./pages/Admin/Courses/AdminCourses";
+import CourseForm from "./pages/Admin/Courses/CourseForm";
+import AdminLessons from "./pages/Admin/Lessons/AdminLessons";
+import LessonForm from "./pages/Admin/Lessons/LessonForm";
+import AdminChallenges from "./pages/Admin/Challenges/AdminChallenges";
+import ChallengeForm from "./pages/Admin/Challenges/ChallengeForm";
+import AdminUsers from "./pages/Admin/Users/AdminUsers";
 
 // Protected Route Wrapper
 const ProtectedRoute = () => {
@@ -69,6 +79,19 @@ function App() {
             <Route path="/courses/:courseId" element={<CourseDetails />} />
             <Route path="/mentor" element={<Mentor />} />
             <Route path="/curriculum" element={<Curriculum />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/courses" element={<AdminCourses />} />
+            <Route path="/admin/courses/:courseId/edit" element={<CourseForm />} />
+            <Route path="/admin/courses/new" element={<CourseForm />} />
+            <Route path="/admin/courses/:courseId/lessons" element={<AdminLessons />} />
+            <Route path="/admin/courses/:courseId/lessons/:lessonId/edit" element={<LessonForm />} />
+            <Route path="/admin/courses/:courseId/lessons/new" element={<LessonForm />} />
+            <Route path="/admin/lessons/:lessonId/challenges" element={<AdminChallenges />} />
+            <Route path="/admin/lessons/:lessonId/challenges/:challengeId/edit" element={<ChallengeForm />} />
+            <Route path="/admin/lessons/:lessonId/challenges/new" element={<ChallengeForm />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
             {/* Add more protected routes here */}
           </Route>
 

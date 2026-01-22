@@ -63,7 +63,9 @@ export interface Challenge {
   id: string;
   lessonId?: string;
   title: string;
+  description?: string;
   starterCodes: Record<string, string>; // Map of language -> code
+  solutionCodes?: Record<string, string>;
   testCases?: TestCase[]; // Students see only isHidden: false
 }
 
