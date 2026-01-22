@@ -61,6 +61,15 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode = false }) => {
               Mentors
             </NavLink>
 
+            {isAuthenticated && (user?.role === "ADMIN" || user?.role === "INSTRUCTOR") && (
+              <NavLink
+                to="/admin/courses"
+                className={({ isActive }) => textClasses(isActive)}
+              >
+                Admin Panel
+              </NavLink>
+            )}
+
             {isAuthenticated && (
               <NavLink
                 to="/dashboard"
