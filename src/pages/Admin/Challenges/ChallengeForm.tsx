@@ -149,7 +149,7 @@ const ChallengeForm: React.FC = () => {
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout title={isEdit ? "Edit Challenge" : "Create Challenge"}>
       <div className="max-w-5xl">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
           {isEdit ? "Edit Challenge" : "Create Challenge"}

@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "../ui/Button";
+import PageMeta from "../common/PageMeta";
 import { 
   BookOpen, 
   Users, 
@@ -11,9 +12,10 @@ import {
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  title?: string;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -37,6 +39,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen bg-gray-50">
+      <PageMeta title={title ? `${title} - Admin` : "Admin Dashboard"} />
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-6 border-b border-gray-200">

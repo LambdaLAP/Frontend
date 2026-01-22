@@ -81,7 +81,7 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Overview">
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Admin Overview</h1>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from "react-resizable-panels";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
@@ -8,6 +8,7 @@ import type { Lesson, Challenge } from "../../types/api";
 import LessonContent from "./components/LessonContent";
 import CodeWorkspace from "./components/CodeWorkspace";
 import Button from "../../components/ui/Button";
+import PageMeta from "../../components/common/PageMeta";
 
 const LessonView = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
@@ -90,6 +91,7 @@ const LessonView = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-white text-gray-900">
+      <PageMeta title={lesson.title} description={`Learn ${lesson.title} on Lambda LAP`} />
       {/* Navigation Header */}
       <header className="h-14 border-b border-gray-200 flex items-center justify-between px-4 bg-white shadow-sm flex-shrink-0 z-20">
         <div className="flex items-center gap-4">

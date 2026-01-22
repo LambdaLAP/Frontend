@@ -53,7 +53,7 @@ const AdminLessons: React.FC = () => {
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Lessons">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
