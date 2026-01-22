@@ -170,7 +170,7 @@ const Mentor: React.FC = () => {
   };
 
   return (
-    <MainLayout>
+    <MainLayout title="AI Mentor">
       <div className="flex h-[calc(100vh-64px)] bg-white overflow-hidden">
         {/* Sidebar */}
         <div className="w-64 bg-white border-r border-gray-100 flex-shrink-0 flex flex-col hidden md:flex">

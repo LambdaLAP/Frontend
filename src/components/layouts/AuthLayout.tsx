@@ -2,6 +2,7 @@ import React from "react";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/Logo.png";
+import PageMeta from "../common/PageMeta";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -16,6 +17,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 }) => {
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+      <PageMeta title={`${title} - Lambda LAP`} />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link to="/" className="flex justify-center mb-6">
           <img src={logo} alt="Lambda LAP" className="h-12 w-auto" />

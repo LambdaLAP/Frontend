@@ -80,7 +80,7 @@ const CourseForm: React.FC = () => {
 
   if (isFetching) {
     return (
-      <AdminLayout>
+      <AdminLayout title="Loading...">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
@@ -89,7 +89,7 @@ const CourseForm: React.FC = () => {
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout title={isEdit ? "Edit Course" : "Create Course"}>
       <div className="max-w-2xl">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
           {isEdit ? "Edit Course" : "Create Course"}

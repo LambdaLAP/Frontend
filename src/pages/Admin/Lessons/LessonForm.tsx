@@ -70,7 +70,7 @@ const LessonForm: React.FC = () => {
 
   if (isFetching) {
     return (
-      <AdminLayout>
+      <AdminLayout title="Loading...">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
@@ -79,7 +79,7 @@ const LessonForm: React.FC = () => {
   }
 
   return (
-    <AdminLayout>
+    <AdminLayout title={isEdit ? "Edit Lesson" : "Create Lesson"}>
       <div className="max-w-4xl">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
           {isEdit ? "Edit Lesson" : "Create Lesson"}

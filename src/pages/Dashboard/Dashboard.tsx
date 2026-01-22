@@ -37,7 +37,7 @@ const Dashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <MainLayout>
+      <MainLayout title="Dashboard">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
   const stats = data?.stats || user?.stats;
 
   return (
-    <MainLayout>
+    <MainLayout title="Dashboard">
       <div className="space-y-8">
         {/* Welcome Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">

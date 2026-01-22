@@ -83,7 +83,7 @@ const CourseDetails: React.FC = () => {
 
   if (isLoading) {
     return (
-      <MainLayout>
+      <MainLayout title="Loading...">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
@@ -93,7 +93,7 @@ const CourseDetails: React.FC = () => {
 
   if (!course || !syllabus) {
     return (
-      <MainLayout>
+      <MainLayout title="Course Not Found">
         <div className="text-center py-12">
           <h2 className="text-xl font-bold text-gray-900">Course not found</h2>
           <Link to="/courses">
@@ -172,7 +172,7 @@ const CourseDetails: React.FC = () => {
   };
 
   return (
-    <MainLayout>
+    <MainLayout title={course.title}>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">

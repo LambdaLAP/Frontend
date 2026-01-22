@@ -45,7 +45,7 @@ const Curriculum: React.FC = () => {
   ];
 
   return (
-    <MainLayout>
+    <MainLayout title="Curriculum Roadmap">
       <div className="max-w-4xl mx-auto">
         <div className="text-center py-10">
           <h1 className="text-4xl font-display font-bold text-gray-900 mb-4">
